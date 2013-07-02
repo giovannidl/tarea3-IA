@@ -1,8 +1,13 @@
 package dataManagement.decisionTrees;
 
-public abstract class Node
+public class Node
 {
 	boolean leaf;
-	double classType;
-	int attrNum;
+	double[] coefs;
+	
+	//Menor que cero
+	Node leftChild;
+	
+	//Mayor que cero
+	Node rightChild;
 }

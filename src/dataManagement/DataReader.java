@@ -40,6 +40,7 @@ public class DataReader
 		catch(IOException ex)
 		{
 			System.out.println("No existe el archivo ingresado. " + ex.getMessage());
+			throw new RuntimeException(ex);
 		}
 		
 		return data;
@@ -58,7 +59,7 @@ public class DataReader
 		//Comienza la iteración desde 1 porque las lineas comienzan con dos espacios.
 		final int startIteration = 1;
 		
-		String[] atts = line.split("  ");
+		String[] atts = line.split(" +");
 		List < Double > doubleList = new ArrayList < Double >();
 		try
 		{
@@ -69,7 +70,8 @@ public class DataReader
 		}
 		catch(NumberFormatException ex)
 		{
-			System.out.println(ex.getMessage());
+			System.out.println("Error en el parseo:" + ex.getMessage());
+			throw new RuntimeException(ex);
 		}
 		
 		return doubleList;

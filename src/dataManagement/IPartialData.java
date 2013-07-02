@@ -19,7 +19,13 @@ public interface IPartialData
 	
 	int getLength();
 	
+	double[][] getAttributes();
+	
 	double getEntropy();
 	
 	double getPurity();
+	
+	double getTopDividerAttribute(int attrNum);
+	
+	Double[] getDiscreteValues(int attrNum);
 }

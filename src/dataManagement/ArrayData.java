@@ -40,11 +40,11 @@ public class ArrayData implements IData
 		
 		this.testPart = 0;
 		this.testDataLength = this.data.length / NUM_CROSS_VALIDATION;
-		this.trainingDataLength = this.testDataLength * (NUM_CROSS_VALIDATION - 1);
+		this.trainingDataLength = this.data.length - this.testDataLength;
 		this.testData = null;
 		this.trainingData = null;
 		
-		this.classesCount = this.countDiscreteValues(this.data.length - 1);
+		this.classesCount = this.countDiscreteValues(this.data[0].length - 1);
 		this.setEntropy();
 	}
 	
@@ -160,7 +160,7 @@ public class ArrayData implements IData
 	
 	private void setEntropy()
 	{
-		int attrNum = this.data.length - 1;
+		int attrNum = this.data[0].length - 1;
 		
 		List < Double > attributeValues = new ArrayList < Double >();
 		int[] discreteData = new int[this.classesCount];

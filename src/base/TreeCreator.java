@@ -24,7 +24,15 @@ public class TreeCreator
 		final int initialMinLevel = 2;
 		final int finalMinLevel = 5;
 		
-		for(int i = initialMinLevel; i <= finalMinLevel; i ++)
-			TreeTrainer.getInstance().trainTree(expData, i);
+		final int initialKValue = 1;
+		final int finalKValue = 4;
+		
+		for(int k = initialKValue; k <= finalKValue; k++)
+		{
+			for(int i = initialMinLevel; i <= finalMinLevel; i ++)
+			{
+				TreeTrainer.getInstance().trainTree(expData, i, k);
+			}
+		}
 	}
 }

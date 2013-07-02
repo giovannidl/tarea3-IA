@@ -32,7 +32,7 @@ public class PartialArrayData implements IPartialData
 		}
 		
 		this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
-		this.classesCount = this.countDiscreteValues(this.data.length - 1);
+		this.classesCount = this.getDiscreteValues(this.data[0].length - 1).length;
 		this.setEntropyAndPurity();
 	}
 	
@@ -109,6 +109,31 @@ public class PartialArrayData implements IPartialData
 		return dividedData;
 	}
 	
+	//Divide la data según un hiperplano definido por los coeficientes de cada atributo
+	public IPartialData[] divideData(double[] coefs)
+	{
+		List < double[] > lessThanZeroRecords = new ArrayList < double[] >();
+		List < double[] > moreThanZeroRecords = new ArrayList < double[] >();
+		for(int recordPos = 0; recordPos < this.data.length; recordPos++)
+		{
+			double result = 0;
+			for(int attrPos = 0; attrPos < this.attributeCount - 1; attrPos++)
+			{
+				result += coefs[attrPos] * this.data[recordPos][attrPos];
+			}
+			if(result < 0)
+				lessThanZeroRecords.add(this.data[recordPos]);
+			else
+				moreThanZeroRecords.add(this.data[recordPos]);
+		}
+		
+		IPartialData[] dividedData = new IPartialData[2];
+		dividedData[0] = new PartialArrayData(lessThanZeroRecords.toArray(new double[0][]), this.attrTypes);
+		dividedData[1] = new PartialArrayData(moreThanZeroRecords.toArray(new double[0][]), this.attrTypes);
+		
+		return dividedData;
+	}
+	
 	public IPartialData[] divideByDiscreteAttribute(int attrNum)
 	{
 		List < Double > attributeValues = new ArrayList < Double >();
@@ -132,6 +157,11 @@ public class PartialArrayData implements IPartialData
 		}
 		
 		return dividedData;
+	}
+	
+	public double[][] getAttributes()
+	{
+		return this.attrArray;
 	}
 	
 	public int getLength()
@@ -170,7 +200,7 @@ public class PartialArrayData implements IPartialData
 		return this.data[finalPos][attrNum];
 	}
 	
-	private int countDiscreteValues(int attrNum)
+	public Double[] getDiscreteValues(int attrNum)
 	{
 		List < Double > attributeValues = new ArrayList < Double >();
 		
@@ -182,12 +212,12 @@ public class PartialArrayData implements IPartialData
 			}
 		}
 		
-		return attributeValues.size();
+		return attributeValues.toArray(new Double[0]);
 	}
 	
 	private void setEntropyAndPurity()
 	{
-		int attrNum = this.data.length - 1;
+		int attrNum = this.data[0].length - 1;
 		
 		List < Double > attributeValues = new ArrayList < Double >();
 		int[] discreteData = new int[this.classesCount];
