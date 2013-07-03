@@ -29,10 +29,12 @@ public class TreeCreator
 		final int initialKValue = 1;
 		final int finalKValue = 4;
 		
+		System.out.println("Data file: " + filePath);
 		for(int k = initialKValue; k <= finalKValue; k++)
 		{
 			for(int i = initialMinRecords; i <= finalMinRecords; i ++)
 			{
+				System.out.println("\n** k = " + k + ", minRecords = " + i);
 				TreeTrainer.getInstance().trainTree(expData, i, k);
 			}
 		}

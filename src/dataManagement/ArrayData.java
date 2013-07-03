@@ -21,6 +21,9 @@ public class ArrayData implements IData
 	
 	private AttributeType[] attrTypes;
 	private int classesCount;
+	private List<Double> classesNames;
+	
+	private String name;
 	
 	public ArrayData(List < List < Double > > dataList)
 	{
@@ -44,7 +47,8 @@ public class ArrayData implements IData
 		this.testData = null;
 		this.trainingData = null;
 		
-		this.classesCount = this.countDiscreteValues(this.data[0].length - 1);
+		this.setClassesNames();
+		
 		this.setEntropy();
 	}
 	
@@ -158,6 +162,27 @@ public class ArrayData implements IData
 		return attributeValues.size();
 	}
 	
+	/**
+	 * Calcula this.classesNames y this.classesCount.
+	 * (Nombre y cantidad de clases en el set de datos)
+	 */
+	private void setClassesNames()
+	{
+		int attrNum = this.data[0].length - 1;
+		List < Double > attributeValues = new ArrayList < Double >();
+		
+		for(int recordPos = 0; recordPos < this.data.length; recordPos++)
+		{
+			if(!attributeValues.contains(this.data[recordPos][attrNum]))
+			{
+				attributeValues.add(this.data[recordPos][attrNum]);
+			}
+		}
+		
+		this.classesNames = attributeValues;
+		this.classesCount = attributeValues.size();
+	}
+	
 	private void setEntropy()
 	{
 		int attrNum = this.data[0].length - 1;
@@ -183,5 +208,20 @@ public class ArrayData implements IData
 			double partial = discreteData[i] / this.data.length;
 			this.entropy -= (partial * Math.log(partial) / Math.log(2));
 		}
+	}
+	
+	public String getName() 
+	{
+		return name;
+	}
+	
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public List<Double> getClassesNames()
+	{
+		return classesNames;
 	}
 }

@@ -4,6 +4,7 @@ import dataManagement.IPartialData;
 
 public class ObliqueTree implements IDecisionTree
 {
+	private final double EPSILON = 0.0000000001; 
 	private Node root;
 	private int minRecords;
 	private int k;
@@ -59,13 +60,12 @@ public class ObliqueTree implements IDecisionTree
 			{
 				result += auxNode.getCoefs()[attrPos] * record[attrPos];
 			}
-			
-			//Perdida de información en los decimales
-			if(result == 0.9999999999999999)
-				result = 1;
-			
+						
 			//El último coeficiente corresponde al coeficiente libre
 			result += auxNode.getCoefs()[auxNode.getCoefs().length - 1];
+			
+			//Bias a la derecha cuando hay errores de redondeo
+			result += EPSILON;
 			
 			if(result < 0)
 				auxNode = auxNode.getLeftChild();

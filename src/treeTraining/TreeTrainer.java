@@ -2,6 +2,7 @@ package treeTraining;
 
 import java.util.List;
 
+import utils.MathUtils;
 import dataManagement.AttributeType;
 import dataManagement.IData;
 import dataManagement.IPartialData;
@@ -28,31 +29,58 @@ public class TreeTrainer
 	
 	public void trainTree(IData data, int minRecords, int k)
 	{
+		List<Double> classesNames = data.getClassesNames();
+		// matriz de confusion
+		int[][] confMatrixMean = new int[classesNames.size()][classesNames.size()];
+		
 		for(int i = 0; i < NUM_CROSS_VALIDATION; i++)
 		{
+			// train
 			data.setTestNumPart(i);
 			IDecisionTree tree = new ObliqueTree(minRecords, k);
 			tree.train(data.getTrainingData());
 			
-			this.testTree(data.getTestData(), tree);
+			// test
+			IPartialData testData = data.getTestData();
+			int[][] confMatrixFold = this.testTree(testData, tree, classesNames);
+			
+			System.out.println(String.format("Fold %d. Accuracy: %.3f", i+1, 
+											(double)MathUtils.MatrixTrace(confMatrixFold) / testData.getLength()));
+			
+			MathUtils.MatrixAdd(confMatrixMean, confMatrixFold);
+		}
+		
+		System.out.println(String.format("+Accuracy (avg.): %.3f", 
+										(double)MathUtils.MatrixTrace(confMatrixMean) / data.getLength()));
+		
+		for(int i = 0; i < classesNames.size(); i++)
+		{
+			int TP = confMatrixMean[i][i];	// true positive
+			int GT = MathUtils.MatrixSumColumn(confMatrixMean, i); // ground truth (TP + FN)
+			double recall = (double)TP / GT; 
+			
+			System.out.println(String.format("+Recall Class %.0f: %.3f (%d/%d)", classesNames.get(i), recall, TP, GT));
+			
+			// puedo calcular accuracy/precision, sensitivity/specificity pero no quiero spammear la consola aun
 		}
 	}
 	
-	private void testTree(IPartialData data, IDecisionTree tree)
+	/**
+	 * Retorna la matriz de confusion del arbol usando la data de testing.
+	 * confMatrix[#real][#predicted]
+	 */
+	private int[][] testTree(IPartialData data, IDecisionTree tree, List<Double> classesNames)
 	{
-		int correctClassified = 0;
+		int[][] confMatrix = new int[classesNames.size()][classesNames.size()];
+		
 		for(int recordPos = 0; recordPos < data.getLength(); recordPos++)
 		{
 			double[] record = data.getRecord(recordPos);
-			double recordClass = tree.classify(record);
-			if(recordClass == record[record.length - 1])
-				correctClassified++;
+			double predictedClass = tree.classify(record);
+			
+			confMatrix[classesNames.indexOf(record[record.length - 1])][classesNames.indexOf(predictedClass)] += 1;
 		}
-		
-		double percentage = ((double) correctClassified / data.getLength()) * 100;
-		
-		System.out.println("El porcentaje de clasificaciones correctas fue " + percentage + "%");
-		//TODO hacer
+		return confMatrix;
 	}
 	
 	//Unfinished

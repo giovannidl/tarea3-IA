@@ -1,5 +1,7 @@
 package dataManagement;
 
+import java.util.List;
+
 public interface IData
 {
 	AttributeType getAttributeType(int attrPos);
@@ -15,4 +17,8 @@ public interface IData
 	int getLength();
 	
 	double getEntropy();
+	
+	String getName();
+	
+	List<Double> getClassesNames();
 }

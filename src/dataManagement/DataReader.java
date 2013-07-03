@@ -17,8 +17,6 @@ public class DataReader
 	
 	public IData getData(String path)
 	{
-		IData data = null;
-		
 		try
 		{
 			FileInputStream fstream = new FileInputStream(path);
@@ -32,18 +30,18 @@ public class DataReader
 				
 				line = br.readLine();
 			}
-			
-			data = new ArrayData(dataList);
-			
 			br.close();
+			
+			ArrayData data = new ArrayData(dataList);
+			data.setName(path);
+			
+			return data;
 		}
 		catch(IOException ex)
 		{
 			System.out.println("No existe el archivo ingresado. " + ex.getMessage());
 			throw new RuntimeException(ex);
 		}
-		
-		return data;
 	}
 	
 	public static DataReader getInstance()
