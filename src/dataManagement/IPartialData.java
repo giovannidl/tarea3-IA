@@ -12,6 +12,8 @@ public interface IPartialData
 	IPartialData getMoreThanRecords(int attrNum, double value);
 	
 	IPartialData getLessThanRecords(int attrNum, double value);
+
+	IPartialData[] divideData(double[] coefs);
 	
 	IPartialData[] divideData(int attrNum, double value);
 	
@@ -25,7 +27,11 @@ public interface IPartialData
 	
 	double getPurity();
 	
-	double getTopDividerAttribute(int attrNum);
+	double getMayorityClass();
+	
+	boolean isSingleClass();
+	
+	double getBestPivotAttribute(int attrNum);
 	
 	Double[] getDiscreteValues(int attrNum);
 }

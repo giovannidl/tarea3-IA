@@ -26,19 +26,19 @@ public class TreeTrainer
 		return instance;
 	}
 	
-	public void trainTree(IData data, int minLevel, int k)
+	public void trainTree(IData data, int minRecords, int k)
 	{
 		for(int i = 0; i < NUM_CROSS_VALIDATION; i++)
 		{
 			data.setTestNumPart(i);
-			IDecisionTree tree = new ObliqueTree(minLevel, k);
+			IDecisionTree tree = new ObliqueTree(minRecords, k);
 			tree.train(data.getTrainingData());
 			
 			this.testTree(data.getTestData(), tree);
 		}
 	}
 	
-	private IDecisionTree getObliqueTree(IPartialData data, int minLevel, int k)
+	private IDecisionTree getObliqueTree(IPartialData data, int minRecords, int k)
 	{
 		
 		return null;
@@ -50,7 +50,7 @@ public class TreeTrainer
 	}
 	
 	//Unfinished
-	private IDecisionTree getClassicTree(IPartialData data, int minLevel)
+	private IDecisionTree getClassicTree(IPartialData data, int minRecords)
 	{
 		IDecisionTree tree = new ClassicDecisionTree();
 		double maxGain = 0;
@@ -68,7 +68,7 @@ public class TreeTrainer
 			}
 			else
 			{
-				continuousValue = data.getTopDividerAttribute(attrNum);
+				continuousValue = data.getBestPivotAttribute(attrNum);
 				dividedData = data.divideData(attrNum, continuousValue);
 			}
 			

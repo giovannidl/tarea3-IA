@@ -12,6 +12,8 @@ public class PartialArrayData implements IPartialData
 	final private int attributeCount;
 	private double entropy;
 	private double purity;
+	private double mayorityClass;
+	private boolean singleClass;
 	
 	private AttributeType[] attrTypes;
 	private int classesCount;
@@ -32,8 +34,17 @@ public class PartialArrayData implements IPartialData
 		}
 		
 		this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
-		this.classesCount = this.getDiscreteValues(this.data[0].length - 1).length;
-		this.setEntropyAndPurity();
+		if(data.length == 0)
+		{
+			this.classesCount = 0;
+			this.entropy = 999999;
+			this.purity = 0;
+		}
+		else
+		{
+			this.classesCount = this.getDiscreteValues(this.attributeCount - 1).length;
+			this.setEntropyAndPurity();
+		}
 	}
 	
 	public AttributeType getAttributeType(int attrPos)
@@ -97,10 +108,10 @@ public class PartialArrayData implements IPartialData
 		
 		for(int recordPos = 0; recordPos < this.data.length; recordPos++)
 		{
-			if(this.data[recordPos][attrNum] >= value)
-				moreThanRecords.add(data[recordPos]);
-			else
+			if(this.data[recordPos][attrNum] < value)
 				lessThanRecords.add(data[recordPos]);
+			else
+			moreThanRecords.add(data[recordPos]);
 		}
 		
 		dividedData[0] = new PartialArrayData(lessThanRecords.toArray(new double[0][]), this.attrTypes);
@@ -117,10 +128,19 @@ public class PartialArrayData implements IPartialData
 		for(int recordPos = 0; recordPos < this.data.length; recordPos++)
 		{
 			double result = 0;
+			//Recorremos los atributos menos el último que corresponde a la clase
 			for(int attrPos = 0; attrPos < this.attributeCount - 1; attrPos++)
 			{
 				result += coefs[attrPos] * this.data[recordPos][attrPos];
 			}
+			
+			//Perdida de información en los decimales
+			if(result == 0.9999999999999999)
+				result = 1;
+			
+			//El último coeficiente corresponde al coeficiente libre
+			result += coefs[this.attributeCount - 1];
+			
 			if(result < 0)
 				lessThanZeroRecords.add(this.data[recordPos]);
 			else
@@ -179,21 +199,33 @@ public class PartialArrayData implements IPartialData
 		return this.purity;
 	}
 	
-	public double getTopDividerAttribute(int attrNum)
+	public double getMayorityClass()
 	{
-		final int iterationNumber = 100;
+		return this.mayorityClass;
+	}
+	
+	public boolean isSingleClass()
+	{
+		return this.singleClass;
+	}
+	
+	public double getBestPivotAttribute(int attrNum)
+	{
 		int finalPos = 0;
-		double bestPurity = 0;
-		for(int i = 0; i < iterationNumber && i < this.data.length; i++)
+		double maxGain = 0;
+		for(int pos = 0; pos < this.data.length; pos++)
 		{
-			int pos = ((Double)(Math.random() * this.data.length)).intValue();
 			IPartialData[] dividedData = this.divideData(attrNum, this.data[pos][attrNum]);
-			
-			double purity = (dividedData[0].getPurity() + dividedData[1].getPurity()) / 2;
-			if(purity > bestPurity)
+			double gain = this.getEntropy();
+			for(IPartialData partialData : dividedData)
 			{
+				gain -= ((double)partialData.getLength() / this.getLength()) * partialData.getEntropy();
+			}
+			
+			if(gain > maxGain)
+			{
+				maxGain = gain;
 				finalPos = pos;
-				bestPurity = purity;
 			}
 		}
 		
@@ -233,7 +265,6 @@ public class PartialArrayData implements IPartialData
 			//Se aumenta el contador
 			discreteData[attributeValues.indexOf(this.data[recordPos][attrNum])]++;
 		}
-		
 		//Para obtener la pureza
 		int topRep = 0;
 		
@@ -241,13 +272,21 @@ public class PartialArrayData implements IPartialData
 		this.entropy = 0;
 		for(int i = 0; i < discreteData.length; i++)
 		{
-			double partial = discreteData[i] / this.data.length;
+			double partial = (double)discreteData[i] / this.data.length;
 			this.entropy -= (partial * Math.log(partial) / Math.log(2));
 			
 			if(discreteData[i] > topRep)
+			{
 				topRep = discreteData[i];
+
+				//Aprovecharemos el método para guardar el valor de la clase mayoritaria
+				this.mayorityClass = attributeValues.get(i);
+			}
 		}
 		
-		this.purity = topRep / this.data.length;
+		this.purity = (double) topRep / this.data.length;
+		
+		if(this.purity == 1)
+			this.singleClass = true;
 	}
 }
