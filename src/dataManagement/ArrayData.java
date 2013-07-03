@@ -2,19 +2,16 @@ package dataManagement;
 
 import java.util.ArrayList;
 import java.util.List;
+import treeTraining.TreeTrainer;
 
 public class ArrayData implements IData
 {
-	private static int NUM_CROSS_VALIDATION = 10;
-	
 	private double[][] data;
 	
-	private int testPart;
+	private int currentFold;
 	private IPartialData testData;
 	private IPartialData trainingData;
 	
-	final private int testDataLength;
-	final private int trainingDataLength;
 	final private int attributeCount;
 	
 	private double entropy;
@@ -41,9 +38,7 @@ public class ArrayData implements IData
 		this.attrTypes = new AttributeType[this.attributeCount];
 		this.setAttributeType();
 		
-		this.testPart = 0;
-		this.testDataLength = this.data.length / NUM_CROSS_VALIDATION;
-		this.trainingDataLength = this.data.length - this.testDataLength;
+		this.currentFold = 0;
 		this.testData = null;
 		this.trainingData = null;
 		
@@ -77,21 +72,28 @@ public class ArrayData implements IData
 		return this.trainingData;
 	}
 	
-	public int getTestNumPart()
+	public int getCurrentFold()
 	{
-		return this.testPart;
+		return this.currentFold;
 	}
 	
-	public void setTestNumPart(int num)
+	public void setCurrentFold(int num)
 	{
-		this.testPart = num;
+		this.currentFold = num;
 		
 		int dataPos = 0;
 		int trainingPos = 0;
-		double[][] trainingData = new double[this.trainingDataLength][this.attributeCount];
-		double[][] testData = new double[this.testDataLength][this.attributeCount];
 		
-		final int initialTestPos = (this.data.length / NUM_CROSS_VALIDATION) * this.testPart;
+		int testDataLength = this.data.length / TreeTrainer.NUM_CROSS_VALIDATION;
+		// en ultimo fold incluir toda la ultima data
+		if (num + 1 == TreeTrainer.NUM_CROSS_VALIDATION)
+			testDataLength += this.data.length % TreeTrainer.NUM_CROSS_VALIDATION;
+		int trainingDataLength = this.data.length - testDataLength;
+		
+		double[][] trainingData = new double[trainingDataLength][this.attributeCount];
+		double[][] testData = new double[testDataLength][this.attributeCount];
+		
+		final int initialTestPos = (this.data.length / TreeTrainer.NUM_CROSS_VALIDATION) * this.currentFold;
 		//TODO ver si lo toma con cero
 		//Copiamos la parte inicial al set de entrenamiento
 		for(; dataPos < initialTestPos; dataPos++, trainingPos++)
@@ -103,7 +105,7 @@ public class ArrayData implements IData
 		}
 		
 		//Agregamos la parte al set de test
-		for(int testPos = 0; testPos < this.testDataLength; dataPos++, testPos++)
+		for(int testPos = 0; testPos < testDataLength; dataPos++, testPos++)
 		{
 			for(int attrPos = 0; attrPos < this.data[dataPos].length; attrPos++)
 			{
