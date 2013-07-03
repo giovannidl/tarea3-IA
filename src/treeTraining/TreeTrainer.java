@@ -38,14 +38,20 @@ public class TreeTrainer
 		}
 	}
 	
-	private IDecisionTree getObliqueTree(IPartialData data, int minRecords, int k)
-	{
-		
-		return null;
-	}
-	
 	private void testTree(IPartialData data, IDecisionTree tree)
 	{
+		int correctClassified = 0;
+		for(int recordPos = 0; recordPos < data.getLength(); recordPos++)
+		{
+			double[] record = data.getRecord(recordPos);
+			double recordClass = tree.classify(record);
+			if(recordClass == record[record.length - 1])
+				correctClassified++;
+		}
+		
+		double percentage = ((double) correctClassified / data.getLength()) * 100;
+		
+		System.out.println("El porcentaje de clasificaciones correctas fue " + percentage + "%");
 		//TODO hacer
 	}
 	

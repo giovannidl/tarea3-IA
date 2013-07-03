@@ -31,6 +31,8 @@ public interface IPartialData
 	
 	boolean isSingleClass();
 	
+	double[] getRecord(int pos);
+	
 	double getBestPivotAttribute(int attrNum);
 	
 	Double[] getDiscreteValues(int attrNum);

@@ -43,4 +43,10 @@ public class ClassicDecisionTree implements IDecisionTree
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public double classify(double[] record) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

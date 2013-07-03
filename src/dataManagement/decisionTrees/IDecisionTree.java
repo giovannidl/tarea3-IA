@@ -5,4 +5,6 @@ import dataManagement.IPartialData;
 public interface IDecisionTree
 {
 	public void train(IPartialData data);
+	
+	double classify(double[] record);
 }

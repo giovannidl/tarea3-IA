@@ -50,8 +50,29 @@ public class ObliqueTree implements IDecisionTree
 	
 	public double classify(double[] record)
 	{
-		//TODO no implementado
-		return -5;
+		Node auxNode = this.root;
+		while(!auxNode.isLeaf())//TODO no implementado
+		{
+			double result = 0;
+			//El último atributo es la clase a la que corresponde
+			for(int attrPos = 0; attrPos < record.length - 1; attrPos++)
+			{
+				result += auxNode.getCoefs()[attrPos] * record[attrPos];
+			}
+			
+			//Perdida de información en los decimales
+			if(result == 0.9999999999999999)
+				result = 1;
+			
+			//El último coeficiente corresponde al coeficiente libre
+			result += auxNode.getCoefs()[auxNode.getCoefs().length - 1];
+			
+			if(result < 0)
+				auxNode = auxNode.getLeftChild();
+			else
+				auxNode = auxNode.getRightChild();
+		}
+		return auxNode.getLeafClass();
 	}
 	
 	private double[] calculateCoefficients(IPartialData data)

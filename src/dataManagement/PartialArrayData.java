@@ -209,6 +209,11 @@ public class PartialArrayData implements IPartialData
 		return this.singleClass;
 	}
 	
+	public double[] getRecord(int pos)
+	{
+		return this.data[pos];
+	}
+	
 	public double getBestPivotAttribute(int attrNum)
 	{
 		int finalPos = 0;
