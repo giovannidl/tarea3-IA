@@ -37,6 +37,8 @@ public class ArrayData implements IData
 		
 		this.randomizeData();
 		
+		this.normalizeData();
+		
 		this.attrTypes = new AttributeType[this.attributeCount];
 		this.setAttributeType();
 		
@@ -208,6 +210,35 @@ public class ArrayData implements IData
 			auxRecord = data[randomPos];
 			data[randomPos] = data[i];
 			data[i] = auxRecord;
+		}
+	}
+	
+	/**
+	 * Normalizacion atributos en rango (0, 1) (con bias positivo de +EPSILON).
+	 * No incluye el cero.
+	 */
+	private void normalizeData()
+	{
+		double EPSILON = 0.001;  // bias para que data sea > 0
+		
+		for(int a = 0; a < data[0].length - 1; a++)
+		{
+			double minValue = Double.MAX_VALUE;
+			double maxValue = Double.MIN_VALUE;
+			
+			// encontrar cotas
+			for(int r = 0; r < data.length; r++)
+			{
+				if (data[r][a] < minValue)
+					minValue = data[r][a];
+				if (data[r][a] > maxValue)
+					maxValue = data[r][a];
+			}
+			// normalizar
+			for(int r = 0; r < data.length; r++)
+			{
+				data[r][a] = (data[r][a] - minValue) / maxValue + EPSILON;
+			}
 		}
 	}
 	
