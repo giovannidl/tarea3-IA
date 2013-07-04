@@ -17,6 +17,8 @@ public class TreeCreator
 		
 		int k = 2;
 		
+		final int restart_iteration = 2;
+		
 		if(args.length != 0)
 		{
 			filePath = args[0];
@@ -33,7 +35,7 @@ public class TreeCreator
 		for(int i = initialMinRecords; i <= finalMinRecords; i ++)
 		{
 			System.out.println("\n** k = " + k + ", minRecords = " + i);
-			TreeTrainer.getInstance().trainTree(expData, i, k);
+			TreeTrainer.getInstance().trainTree(expData, i, k, restart_iteration);
 		}
 	}
 }

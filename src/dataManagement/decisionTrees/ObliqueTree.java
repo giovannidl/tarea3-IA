@@ -8,12 +8,13 @@ import dataManagement.IPartialData;
 
 public class ObliqueTree implements IDecisionTree
 {
-	private final double EPSILON = 0.0000000001; 
+	private final double EPSILON = 0.0000000001;
 	private Node root;
 	private int minRecords;
 	private int k;
+	private int restart_iteration = 0;
 	
-	public ObliqueTree(int minRecords, int k)
+	public ObliqueTree(int minRecords, int k, int restart_iteration)
 	{
 		root = null;
 		this.minRecords = minRecords;
@@ -120,16 +121,45 @@ public class ObliqueTree implements IDecisionTree
 		{
 			List < Integer > attrExpanded = new ArrayList < Integer >();
 			attrExpanded.add(attrSelected);
-			coefs = calculateCombinationCoefficients(data, coefs, attrExpanded, this.k - 1);
+			maxGain = calculateCombinationCoefficients(data, coefs, attrExpanded, this.k - 1, maxGain);
+			
+			//Si k es mayor que uno, implementamos RESTART_ITERATION iteraciones con el primero atributo elegido al azar,
+			//para evitar caer en un mínimo local
+			for(int i = 0; i < this.restart_iteration; i++)
+			{
+				int attrRandom = ((Double)(Math.random() * data.getAttributes().length)).intValue();
+				double valueAttrRandom = data.getBestPivotAttribute(attrRandom);
+				IPartialData[] dividedData = data.divideData(attrRandom, valueAttrRandom);
+				double randomGain = data.getEntropy();
+				for(IPartialData partialData : dividedData)
+				{
+					randomGain -= ((double)partialData.getLength() / data.getLength()) * partialData.getEntropy();
+				}
+				
+				double[] randomCoefs = new double[data.getAttributes().length];
+				randomCoefs[attrRandom] = (double) 1 / valueAttrRandom;
+				randomCoefs[data.getAttributes().length - 1] = -1;
+				
+				List < Integer > attrRandomExpanded = new ArrayList < Integer >();
+				attrRandomExpanded.add(attrSelected);
+				randomGain = calculateCombinationCoefficients(data, randomCoefs, attrRandomExpanded, this.k - 1, randomGain);
+				
+				//Comparamos si la opción random es mejor que la obtenida anteriormente
+				if(randomGain > maxGain)
+				{
+					maxGain = randomGain;
+					this.copyArrays(coefs, randomCoefs);
+				}
+			}
 		}
 		
 		return coefs;
 	}
 
-	private double[] calculateCombinationCoefficients(IPartialData data, double[] coefs, List < Integer > attrExpanded, int k)
+	private double calculateCombinationCoefficients(IPartialData data, double[] coefs, List < Integer > attrExpanded, 
+			int k, double maxGain)
 	{
-		double maxGain = 0;
-		int attrSelected = 0;
+		int attrSelected = -1;
 		
 		//No ocupamos el último atributo porque es la clase del registro.
 		for(int attrNum = 0; attrNum < data.getAttributes().length - 1; attrNum++)
@@ -153,22 +183,28 @@ public class ObliqueTree implements IDecisionTree
 			if(gain > maxGain)
 			{
 				maxGain = gain;
-				coefs = auxCoefs;
+				this.copyArrays(coefs, auxCoefs);
 				attrSelected = attrNum;
 			}
+		}
+		
+		//Si attrSelected sigue siendo negativo, es porque ninguna combinación de atributos mejora la ganancia
+		if(attrSelected == -1)
+		{
+			return maxGain;
 		}
 		
 		//Si k es mayor que uno, lo disminuimos y buscamos los demás coeficientes
 		if(k > 1)
 		{
 			attrExpanded.add(attrSelected);
-			coefs = calculateCombinationCoefficients(data, coefs, attrExpanded, k - 1);
+			maxGain = calculateCombinationCoefficients(data, coefs, attrExpanded, k - 1, maxGain);
 		}
 		
-		return coefs;
+		return maxGain;
 	}
 	
-	private double[] getBestCombinationCoefficients(IPartialData data, double[] coefs, List < Integer > attrExpanded, int attrNum)
+	private double getBestCombinationCoefficients(IPartialData data, double[] coefs, List < Integer > attrExpanded, int attrNum)
 	{
 		List < Integer > actualAttrCoef = new ArrayList < Integer >(attrExpanded);
 		actualAttrCoef.add(attrNum);
@@ -233,7 +269,7 @@ public class ObliqueTree implements IDecisionTree
 		}
 		
 		//Si llegamos hasta aca es porque no se puede mejorar ningún coeficiente, osea tenemos el mejor.
-		return coefs;
+		return maxGain;
 	}
 	
 	private double valuateCoefficients(double[] record, double[] coefs)
@@ -248,5 +284,13 @@ public class ObliqueTree implements IDecisionTree
 		//Le sumamos el coeficiente libre
 		value += coefs[coefs.length - 1];
 		return value;
+	}
+	
+	private void copyArrays(double[] copy, double[] original)
+	{
+		for(int i = 0; i < original.length; i++)
+		{
+			copy[i] = original[i];
+		}
 	}
 }

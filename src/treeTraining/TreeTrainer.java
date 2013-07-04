@@ -27,7 +27,7 @@ public class TreeTrainer
 		return instance;
 	}
 	
-	public void trainTree(IData data, int minRecords, int k)
+	public void trainTree(IData data, int minRecords, int k, int restart_iteration)
 	{
 		List<Double> classesNames = data.getClassesNames();
 		// matriz de confusion
@@ -37,7 +37,7 @@ public class TreeTrainer
 		{
 			// train
 			data.setCurrentFold(i);
-			IDecisionTree tree = new ObliqueTree(minRecords, k);
+			IDecisionTree tree = new ObliqueTree(minRecords, k, restart_iteration);
 			tree.train(data.getTrainingData());
 			
 			// test
