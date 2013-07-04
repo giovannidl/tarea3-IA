@@ -12,13 +12,14 @@ public class ObliqueTree implements IDecisionTree
 	private Node root;
 	private int minRecords;
 	private int k;
-	private int restart_iteration = 0;
+	private int restart_iteration;
 	
 	public ObliqueTree(int minRecords, int k, int restart_iteration)
 	{
 		root = null;
 		this.minRecords = minRecords;
 		this.k = k;
+		this.restart_iteration = restart_iteration;
 	}
 	
 	public void train(IPartialData data)
@@ -124,7 +125,7 @@ public class ObliqueTree implements IDecisionTree
 			maxGain = calculateCombinationCoefficients(data, coefs, attrExpanded, this.k - 1, maxGain);
 			
 			//Si k es mayor que uno, implementamos RESTART_ITERATION iteraciones con el primero atributo elegido al azar,
-			//para evitar caer en un mínimo local
+			//para evitar caer en un máximo local
 			for(int i = 0; i < this.restart_iteration; i++)
 			{
 				int attrRandom = ((Double)(Math.random() * data.getAttributes().length)).intValue();
