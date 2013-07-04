@@ -38,6 +38,8 @@ public class ArrayData implements IData
 			}
 		}
 		
+		this.randomizeData();
+		
 		this.attrTypes = new AttributeType[this.attributeCount];
 		this.setAttributeType();
 		
@@ -147,21 +149,6 @@ public class ArrayData implements IData
 		}
 	}
 	
-	private int countDiscreteValues(int attrNum)
-	{
-		List < Double > attributeValues = new ArrayList < Double >();
-		
-		for(int recordPos = 0; recordPos < this.data.length; recordPos++)
-		{
-			if(!attributeValues.contains(this.data[recordPos][attrNum]))
-			{
-				attributeValues.add(this.data[recordPos][attrNum]);
-			}
-		}
-		
-		return attributeValues.size();
-	}
-	
 	/**
 	 * Calcula this.classesNames y this.classesCount.
 	 * (Nombre y cantidad de clases en el set de datos)
@@ -207,6 +194,18 @@ public class ArrayData implements IData
 		{
 			double partial = discreteData[i] / this.data.length;
 			this.entropy -= (partial * Math.log(partial) / Math.log(2));
+		}
+	}
+	
+	private void randomizeData()
+	{
+		double[] auxRecord;
+		for(int i = 0; i < data.length; i++)
+		{
+			int randomPos = ((Double)(Math.random() * data.length)).intValue();
+			auxRecord = data[randomPos];
+			data[randomPos] = data[i];
+			data[i] = auxRecord;
 		}
 	}
 	
