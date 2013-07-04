@@ -49,4 +49,18 @@ public class ClassicDecisionTree implements IDecisionTree
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public int getNumLeaves()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getMaxDepth()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

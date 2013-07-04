@@ -4,7 +4,11 @@ import dataManagement.IPartialData;
 
 public interface IDecisionTree
 {
-	public void train(IPartialData data);
+	void train(IPartialData data);
 	
 	double classify(double[] record);
+	
+	int getNumLeaves();
+	
+	int getMaxDepth();
 }

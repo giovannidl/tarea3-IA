@@ -44,8 +44,10 @@ public class TreeTrainer
 			IPartialData testData = data.getTestData();
 			int[][] confMatrixFold = this.testTree(testData, tree, classesNames);
 			
-			System.out.println(String.format("Fold %d. Accuracy: %.3f", i+1, 
-											(double)MathUtils.MatrixTrace(confMatrixFold) / testData.getLength()));
+			System.out.println(String.format("Fold %d. Accuracy: %.3f. #leaves: %d. max depth: %d", i+1, 
+											(double)MathUtils.MatrixTrace(confMatrixFold) / testData.getLength(),
+											tree.getNumLeaves(),
+											tree.getMaxDepth()));
 			
 			MathUtils.MatrixAdd(confMatrixMean, confMatrixFold);
 		}

@@ -13,6 +13,9 @@ public class ObliqueTree implements IDecisionTree
 	private int minRecords;
 	private int k;
 	private int restart_iteration;
+	//estadisticas:
+	private int numLeaves;
+	private int maxDepth;
 	
 	public ObliqueTree(int minRecords, int k, int restart_iteration)
 	{
@@ -27,20 +30,24 @@ public class ObliqueTree implements IDecisionTree
 		double[] coefs = this.calculateCoefficients(data);
 		
 		this.root = new Node(coefs);
-		IPartialData[] dividedData = data.divideData(coefs);
 		this.root.setLeftChild(new Node());
 		this.root.setRightChild(new Node());
 		
+		IPartialData[] dividedData = data.divideData(coefs);
 		this.trainNode(this.root.getLeftChild(), dividedData[0]);
 		this.trainNode(this.root.getRightChild(), dividedData[1]);
 	}
 	
 	public void trainNode(Node node, IPartialData data)
 	{
+		if (node.getDepth() > maxDepth)
+			maxDepth = node.getDepth();
+		
 		if(data.getLength() < minRecords || data.isSingleClass())
 		{
 			node.setLeaf(true);
 			node.setLeafClass(data.getMayorityClass());
+			this.numLeaves++;
 		}
 		else
 		{
@@ -287,11 +294,21 @@ public class ObliqueTree implements IDecisionTree
 		return value;
 	}
 	
+	public int getNumLeaves()
+	{
+		return this.numLeaves;
+	}
+	
 	private void copyArrays(double[] copy, double[] original)
 	{
 		for(int i = 0; i < original.length; i++)
 		{
 			copy[i] = original[i];
 		}
+	}
+	
+	public int getMaxDepth()
+	{
+		return this.maxDepth;
 	}
 }

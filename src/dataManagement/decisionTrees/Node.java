@@ -5,6 +5,8 @@ public class Node
 	boolean leaf;
 	double[] coefs;
 	double leafClass;
+	//para estadisticas:
+	private int depth;
 	
 	//Menor que cero
 	Node leftChild;
@@ -63,11 +65,13 @@ public class Node
 	public void setLeftChild(Node leftChild)
 	{
 		this.leftChild = leftChild;
+		this.leftChild.depth = this.depth + 1;
 	}
 
 	public void setRightChild(Node rightChild)
 	{
 		this.rightChild = rightChild;
+		this.rightChild.depth = this.depth + 1;
 	}
 
 	public double getLeafClass()
@@ -78,5 +82,10 @@ public class Node
 	public void setLeafClass(double leafClass)
 	{
 		this.leafClass = leafClass;
+	}
+
+	public int getDepth()
+	{
+		return depth;
 	}
 }
