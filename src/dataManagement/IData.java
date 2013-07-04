@@ -10,9 +10,9 @@ public interface IData
 	
 	IPartialData getTrainingData();
 	
-	int getTestNumPart();
+	int getCurrentFold();
 	
-	void setTestNumPart(int num);
+	void setCurrentFold(int num);
 	
 	int getLength();
 	

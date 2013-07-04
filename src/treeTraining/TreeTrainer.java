@@ -12,7 +12,7 @@ import dataManagement.decisionTrees.ObliqueTree;
 
 public class TreeTrainer
 {
-	private static int NUM_CROSS_VALIDATION = 10;
+	public static final int NUM_CROSS_VALIDATION = 10;
 	private static TreeTrainer instance;
 	
 	private TreeTrainer()
@@ -36,7 +36,7 @@ public class TreeTrainer
 		for(int i = 0; i < NUM_CROSS_VALIDATION; i++)
 		{
 			// train
-			data.setTestNumPart(i);
+			data.setCurrentFold(i);
 			IDecisionTree tree = new ObliqueTree(minRecords, k);
 			tree.train(data.getTrainingData());
 			
