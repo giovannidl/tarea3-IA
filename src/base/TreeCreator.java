@@ -12,9 +12,15 @@ public class TreeCreator
 		
 		String[] testFiles = new String[] { "glass_mm.txt", "heart_mm.txt", "pima_indians_diabetes.txt" };
 		
+		final int initialMinRecords = 2;
+		final int finalMinRecords = 5;
+		
+		int k = 2;
+		
 		if(args.length != 0)
 		{
 			filePath = args[0];
+			k = Integer.parseInt(args[1]);
 		}
 		else
 		{
@@ -23,20 +29,11 @@ public class TreeCreator
 		
 		IData expData = DataReader.getInstance().getData(filePath);
 		
-		final int initialMinRecords = 2;
-		final int finalMinRecords = 5;
-		
-		final int initialKValue = 1;
-		final int finalKValue = 4;
-		
 		System.out.println("Data file: " + filePath);
-		for(int k = initialKValue; k <= finalKValue; k++)
+		for(int i = initialMinRecords; i <= finalMinRecords; i ++)
 		{
-			for(int i = initialMinRecords; i <= finalMinRecords; i ++)
-			{
-				System.out.println("\n** k = " + k + ", minRecords = " + i);
-				TreeTrainer.getInstance().trainTree(expData, i, k);
-			}
+			System.out.println("\n** k = " + k + ", minRecords = " + i);
+			TreeTrainer.getInstance().trainTree(expData, i, k);
 		}
 	}
 }

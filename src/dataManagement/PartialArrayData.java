@@ -6,6 +6,8 @@ import java.util.List;
 
 public class PartialArrayData implements IPartialData
 {
+	private final double EPSILON = 0.0000000001; 
+	
 	private double[][] data;
 	private double[][] attrArray;
 	
@@ -134,12 +136,11 @@ public class PartialArrayData implements IPartialData
 				result += coefs[attrPos] * this.data[recordPos][attrPos];
 			}
 			
-			//Perdida de información en los decimales
-			if(result == 0.9999999999999999)
-				result = 1;
-			
 			//El último coeficiente corresponde al coeficiente libre
 			result += coefs[this.attributeCount - 1];
+			
+			//Bias a la derecha cuando hay errores de redondeo
+			result += EPSILON;
 			
 			if(result < 0)
 				lessThanZeroRecords.add(this.data[recordPos]);
